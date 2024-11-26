@@ -1,21 +1,35 @@
 CC=gcc
 CFLAGS=-c -Wall -g
-LDFLAGS=-ljpeg
-SOURCES= mandel.c jpegrw.c 
+LDFLAGS=-ljpeg -lm -lpthread -lrt
+SOURCES=mandel.c jpegrw.c
+MOVIE_SOURCES=mandelmovie.c jpegrw.c
 OBJECTS=$(SOURCES:.c=.o)
+MOVIE_OBJECTS=$(MOVIE_SOURCES:.c=.o)
 EXECUTABLE=mandel
+MOVIE_EXECUTABLE=mandelmovie
 
-all: $(SOURCES) $(EXECUTABLE) 
+# Default target: build both executables
+all: $(EXECUTABLE) $(MOVIE_EXECUTABLE)
 
-# pull in dependency info for *existing* .o files
--include $(OBJECTS:.o=.d)
-
+# Compile the mandel executable
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 
-.c.o: 
+# Compile the mandelmovie executable
+$(MOVIE_EXECUTABLE): $(MOVIE_OBJECTS)
+	$(CC) $(MOVIE_OBJECTS) $(LDFLAGS) -o $@
+
+# Rule for .c to .o compilation
+%.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
 	$(CC) -MM $< > $*.d
 
+# Include dependencies for existing .o files
+-include $(OBJECTS:.o=.d) $(MOVIE_OBJECTS:.o=.d)
+
+# Clean up generated files
 clean:
-	rm -rf $(OBJECTS) $(EXECUTABLE) *.d
+	rm -rf $(OBJECTS) $(MOVIE_OBJECTS) $(EXECUTABLE) $(MOVIE_EXECUTABLE) *.d
+
+# Phony targets
+.PHONY: all clean
