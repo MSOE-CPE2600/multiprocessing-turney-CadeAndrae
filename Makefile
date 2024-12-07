@@ -22,7 +22,7 @@ $(MOVIE_EXECUTABLE): $(MOVIE_OBJECTS)
 # Rule for .c to .o compilation
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
-	$(CC) -MM $< > $*.d
+	$(CC) -MM $< -MT $@ > $*.d
 
 # Include dependencies for existing .o files
 -include $(OBJECTS:.o=.d) $(MOVIE_OBJECTS:.o=.d)
